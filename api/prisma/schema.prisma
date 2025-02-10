@@ -15,6 +15,7 @@ model User {
   guid      String?       @unique
   modules   UserModules[]
   results   ExamResult[]
+  answers   UserAnswer[]
   isAdmin   Boolean       @default(false)
 }
 
@@ -36,27 +37,29 @@ model Module {
 }
 
 model Question {
-  id      Int      @id @default(autoincrement())
-  content String   @db.LongText
-  choices Choice[]
-  exam    Exam     @relation(fields: [exam_id], references: [id], onDelete: Cascade)
-  exam_id Int
+  id            Int          @id @default(autoincrement())
+  content       String       @db.LongText
+  choices       Choice[]
+  exam          Exam         @relation(fields: [exam_id], references: [id], onDelete: Cascade)
+  users_answers UserAnswer[]
+  exam_id       Int
 }
 
 model Choice {
-  id        Int      @id @default(autoincrement())
-  content   String   @db.LongText
-  isCorrect Boolean
-  question  Question @relation(fields: [qid], references: [id], onDelete: Cascade)
-  qid       Int
+  id          Int          @id @default(autoincrement())
+  content     String       @db.LongText
+  isCorrect   Boolean
+  question    Question     @relation(fields: [qid], references: [id], onDelete: Cascade)
+  answered_by UserAnswer[]
+  qid         Int
 }
 
 model UserModules {
-  id      Int    @id @default(autoincrement())
-  user    User   @relation(fields: [uid], references: [id], onDelete: Cascade)
+  id     Int    @id @default(autoincrement())
+  user   User   @relation(fields: [uid], references: [id], onDelete: Cascade)
   module Module @relation(fields: [mid], references: [id], onDelete: Cascade)
-  mid     Int
-  uid     String
+  mid    Int
+  uid    String
 }
 
 model ExamResult {
@@ -64,7 +67,17 @@ model ExamResult {
   exam      Exam     @relation(fields: [exam_id], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [uid], references: [id], onDelete: Cascade)
   uid       String
-  score     Float  @db.Float
+  score     Float    @db.Float
   exam_id   Int
   createdAt DateTime @default(now())
+}
+
+model UserAnswer {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  answer     Choice   @relation(fields: [answer_id], references: [id], onDelete: Cascade)
+  quetion    Question @relation(fields: [quetion_id], references: [id], onDelete: Cascade)
+  user_id    String
+  answer_id  Int
+  quetion_id Int
 }
